@@ -1,8 +1,9 @@
-class Player extends Sprite {
-  constructor({ collisionBlocks = [], imageSrc, frameRate, enemy }) {
+class Enemy extends Sprite {
+  constructor({ collisionBlocks = [], imageSrc, frameRate }) {
     super({ imageSrc, frameRate });
+    this.frameBuffer = 6;
     this.position = {
-      x: 200,
+      x: 400,
       // Начальная координата верха игрока
       // let y = 100;
       y: 200,
@@ -13,50 +14,20 @@ class Player extends Sprite {
       y: 0,
     };
 
-    // this.width = 25
-    // Высота игрока
-    // const height = 100;
-    // this.height = 25
-
     this.sides = {
       bottom: this.position.y + this.height,
     };
 
     this.gravity = 1;
-
     this.collisionBlocks = collisionBlocks;
-    // console.log(this.collisionBlocks);
-    // console.log(collisionBlocks);
-
-    this.enemyPositionX = enemy.position.x;
-    this.enemyWidth = enemy.width;
-    console.log(this.enemyPositionX);
   }
 
   update() {
-    // This is blue box
-    // c.fillStyle = 'rgba(0, 0, 255, 0.5'
-    // c.fillRect(this.position.x, this.position.y, this.width, this.height)
-
-    // console.log(this.collisionBlocks)
-    // При обновлении добавляем к верхней координате игрока
-    // velocity, которое с каждым циклом анимации увеличивается на
-    // значение gravity, таким образом имитируя ускорение
     this.position.x += this.velocity.x;
-    // Check horisintal collision
-    // console.log('Update')
-    // console.log(collisionBlocks)
-
     this.updateHitbox();
     this.checkForHorizontalCollision();
-
-    // console.log('Update')
-
-    // Apply gravity
     this.apllyGravity();
-
     this.updateHitbox();
-
     c.fillRect(
       this.hitBox.position.x,
       this.hitBox.position.y,
@@ -64,14 +35,13 @@ class Player extends Sprite {
       this.hitBox.height
     );
     this.checkForVerticalCollision();
-    // this.sides.bottom = this.position.y + this.height;
   }
 
   updateHitbox() {
     this.hitBox = {
       position: {
-        x: this.position.x + 58,
-        y: this.position.y + 34,
+        x: this.position.x + 28,
+        y: this.position.y + 21,
       },
       width: 50,
       height: 53,
@@ -82,10 +52,6 @@ class Player extends Sprite {
     for (let i = 0; i < this.collisionBlocks.length; i++) {
       const collisionBlock = this.collisionBlocks[i];
 
-      // console.log(collisionBlock);
-      // console.log('Hello block')
-
-      // if a collission exist
       if (
         this.hitBox.position.x <=
           collisionBlock.position.x + collisionBlock.width &&
@@ -96,36 +62,18 @@ class Player extends Sprite {
         this.hitBox.position.y <=
           collisionBlock.position.y + collisionBlock.height
       ) {
-        // Столкновение по оси x двигаясь влево
         if (this.velocity.x < 0) {
           const offset = this.hitBox.position.x - this.position.x;
           this.position.x =
             collisionBlock.position.x + collisionBlock.width - offset + 0.01;
-          // console.log('collision left');
+          console.log('collision left');
           break;
         }
         if (this.velocity.x > 0) {
           const offset =
             this.hitBox.position.x - this.position.x + this.hitBox.width;
           this.position.x = collisionBlock.position.x - offset - 0.01;
-          // console.log('collision right');
-          break;
-        }
-      }
-      if (this.hitBox.position.x >= this.enemyPositionX) {
-        // Столкновение по оси x двигаясь влево
-        if (this.velocity.x < 0) {
-          const offset = this.hitBox.position.x - this.position.x;
-          this.position.x =
-            this.enemyPositionX + this.enemyWidth - offset + 0.01;
-          // console.log('collision left');
-          break;
-        }
-        if (this.velocity.x > 0) {
-          const offset =
-          this.enemyPositionX - this.position.x + this.hitBox.width;
-          this.position.x = this.enemyPositionX - offset - 0.01;
-          // console.log('collision right');
+          console.log('collision right');
           break;
         }
       }
@@ -138,15 +86,9 @@ class Player extends Sprite {
   }
 
   checkForVerticalCollision() {
-    // Check vertical collision
-
     for (let i = 0; i < this.collisionBlocks.length; i++) {
       const collisionBlock = this.collisionBlocks[i];
 
-      // console.log(collisionBlock);
-      // console.log('Hello block')
-
-      // if a collission exist
       if (
         this.hitBox.position.x <=
           collisionBlock.position.x + collisionBlock.width &&
@@ -162,7 +104,6 @@ class Player extends Sprite {
           const offset = this.hitBox.position.y - this.position.y;
           this.position.y =
             collisionBlock.position.y + collisionBlock.height - offset + 0.01;
-          // console.log('collision left');
           break;
         }
         if (this.velocity.y > 0) {
@@ -170,24 +111,9 @@ class Player extends Sprite {
           const offset =
             this.hitBox.position.y - this.position.y + this.hitBox.height;
           this.position.y = collisionBlock.position.y - offset - 0.01;
-
-          // console.log('collision right');
           break;
         }
       }
     }
-
-    // Пока координата низа игрока меньше высоты канваса
-    // y++; и обновляем координату низа игрока bottom = y + height;
-    // Координата низа игрока
-    // let bottom = y + height;
-    // if ((this.sides.bottom + this.velocity.y) < canvas.height) {
-    // Увеличиваем ускорение
-    // this.velocity.y += this.gravity;
-
-    // } else {
-    // Обнуляем ускорение
-    //     this.velocity.y = 0
-    // }
   }
 }

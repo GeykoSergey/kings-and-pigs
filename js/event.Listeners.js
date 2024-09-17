@@ -4,7 +4,7 @@ window.addEventListener('keydown', (event) => {
             // Проверка Если ускорение равно нулю, то только
             // тогда сможем сделать прыжок
             // -10px на кадр
-            if (player.velocity.y === 0 && !keys.w.pressed) {player.velocity.y = -25}
+            if (player.velocity.y === 0 && !keys.w.pressed) {player.velocity.y = -15}
             keys.w.pressed = true;
             if (player.velocity.y === 0) {keys.w.pressed = false}
 
