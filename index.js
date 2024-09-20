@@ -20,17 +20,44 @@ const keys = {
 };
 
 // Player
-const enemy = new Enemy({
-  collisionBlocks,
-  imageSrc: './img/pig/idle.png',
-  frameRate: 11,
-});
+// const enemy = new Enemy({
+//   collisionBlocks,
+//   imageSrc: './img/pig/idle.png',
+//   frameRate: 11,
+// });
 
 const player = new Player({
   collisionBlocks,
   imageSrc: './img/king/idle.png',
   frameRate: 11,
-  enemy,
+  animations: {
+    idleRight: {
+      frameRate: 11,
+      frameBuffer: 2,
+      loop: true,
+      imageSrc: './img/king/idle.png',
+    },
+    idleLeft: {
+      frameRate: 11,
+      frameBuffer: 2,
+      loop: true,
+      imageSrc: './img/king/idleLeft.png',
+    },
+    runRight: {
+      frameRate: 8,
+      frameBuffer: 4,
+      loop: true,
+      imageSrc: './img/king/runRight.png',
+    },
+    runLeft: {
+      frameRate: 8,
+      frameBuffer: 4,
+      loop: true,
+      imageSrc: './img/king/runLeft.png',
+      image: new Image(),
+    },
+  },
+  // enemy,
 });
 // Цикл анимации
 // В цикле каждый раз перерисовываем игровую зону и
@@ -52,15 +79,26 @@ function animate() {
   player.velocity.x = 0;
 
   if (keys.d.pressed) {
+    player.switchSprite('runRight');
     player.velocity.x = 5;
+    player.lastDirrection = 'right';
+
   } else if (keys.a.pressed) {
+    player.switchSprite('runLeft');
     player.velocity.x = -5;
+    player.lastDirrection = 'left';
+  } else {
+    if (player.lastDirrection === 'left') {
+      player.switchSprite('idleLeft');
+    } else {
+      player.switchSprite('idleRight');
+    }
   }
 
   player.draw();
-  enemy.draw();
+  // enemy.draw();
   player.update();
-  enemy.update();
+  // enemy.update();
   //   console.log(enemyPositionX);
 }
 

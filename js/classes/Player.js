@@ -1,6 +1,6 @@
 class Player extends Sprite {
-  constructor({ collisionBlocks = [], imageSrc, frameRate, enemy }) {
-    super({ imageSrc, frameRate });
+  constructor({ collisionBlocks = [], imageSrc, frameRate, animations }) {
+    super({ imageSrc, frameRate, animations });
     this.position = {
       x: 200,
       // Начальная координата верха игрока
@@ -27,10 +27,6 @@ class Player extends Sprite {
     this.collisionBlocks = collisionBlocks;
     // console.log(this.collisionBlocks);
     // console.log(collisionBlocks);
-
-    this.enemyPositionX = enemy.position.x;
-    this.enemyWidth = enemy.width;
-    console.log(this.enemyPositionX);
   }
 
   update() {
@@ -65,6 +61,14 @@ class Player extends Sprite {
     );
     this.checkForVerticalCollision();
     // this.sides.bottom = this.position.y + this.height;
+  }
+
+  switchSprite(name) {
+    if (this.image === this.animations[name].image) return;
+    this.currentFrame = 0;
+    this.image = this.animations[name].image;
+    this.frameRate = this.animations[name].frameRate;
+    this.frameBuffer = this.animations[name].frameBuffer;
   }
 
   updateHitbox() {
@@ -108,23 +112,6 @@ class Player extends Sprite {
           const offset =
             this.hitBox.position.x - this.position.x + this.hitBox.width;
           this.position.x = collisionBlock.position.x - offset - 0.01;
-          // console.log('collision right');
-          break;
-        }
-      }
-      if (this.hitBox.position.x >= this.enemyPositionX) {
-        // Столкновение по оси x двигаясь влево
-        if (this.velocity.x < 0) {
-          const offset = this.hitBox.position.x - this.position.x;
-          this.position.x =
-            this.enemyPositionX + this.enemyWidth - offset + 0.01;
-          // console.log('collision left');
-          break;
-        }
-        if (this.velocity.x > 0) {
-          const offset =
-          this.enemyPositionX - this.position.x + this.hitBox.width;
-          this.position.x = this.enemyPositionX - offset - 0.01;
           // console.log('collision right');
           break;
         }
