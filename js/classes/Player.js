@@ -2,10 +2,8 @@ class Player extends Sprite {
   constructor({ collisionBlocks = [], imageSrc, frameRate, animations }) {
     super({ imageSrc, frameRate, animations });
     this.position = {
-      x: 200,
-      // Начальная координата верха игрока
-      // let y = 100;
-      y: 200,
+      x: 600,
+      y: 600,
     };
 
     this.velocity = {

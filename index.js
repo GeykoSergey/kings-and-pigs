@@ -1,7 +1,7 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
-canvas.width = 1024;
-canvas.height = 576;
+canvas.width = 3200;
+canvas.height = 640;
 
 const parsedCollisions = collisionsLevel1.parse2D();
 // console.log(parsedCollisions);
@@ -10,7 +10,7 @@ const collisionBlocks = parsedCollisions.createObjectsFrom2D();
 
 const backgroundlevel1 = new Sprite({
   position: { x: 0, y: 0 },
-  imageSrc: './img/backgroundLevel1.png',
+  imageSrc: './img/untitled.png',
 });
 
 const keys = {
