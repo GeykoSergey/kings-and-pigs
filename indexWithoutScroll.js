@@ -1,10 +1,10 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
-const dpr = window.devicePixelRatio || 1;
-canvas.width = 1600 * dpr;
-canvas.height = 640 * dpr;
-// canvas.width = 3200;
-// canvas.height = 640;
+// const dpr = window.devicePixelRatio || 1;
+// canvas.width = 3200 * dpr;
+// canvas.height = 640 * dpr;
+canvas.width = 3200;
+canvas.height = 640;
 
 // const layersData = {
 //   l_New_Layer_1: l_New_Layer_1,
@@ -13,12 +13,12 @@ canvas.height = 640 * dpr;
 //   l_New_Layer_4: l_New_Layer_4,
 // };
 
-const tileSets = {
-  l_New_Layer_1: { imageUrl: './', tileSize: 32 },
-  l_New_Layer_2: { imageUrl: './', tileSize: 32 },
-  l_New_Layer_3: { imageUrl: './', tileSize: 32 },
-  l_New_Layer_4: { imageUrl: './', tileSize: 32 },
-};
+// const tileSets = {
+//   l_New_Layer_1: { imageUrl: './', tileSize: 32 },
+//   l_New_Layer_2: { imageUrl: './', tileSize: 32 },
+//   l_New_Layer_3: { imageUrl: './', tileSize: 32 },
+//   l_New_Layer_4: { imageUrl: './', tileSize: 32 },
+// };
 
 const parsedCollisions = collisionsLevel1.parse2D();
 // console.log(parsedCollisions);
@@ -81,56 +81,25 @@ const player = new Player({
 // игрока со смещением по у
 
 const camera = {
-  x: 0,
+  x: 300,
   y: 0,
 };
 
-const SCROLL_POST_RIGHT = 800;
-const SCROLL_POST_TOP = 400;
-// const SCROLL_POST_BOTTOM = -100;
-console.log(SCROLL_POST_RIGHT);
-
 function animate() {
+  
   // Игровая зона (равна канвас)
-  // c.fillStyle = '#f5f5f5';
-  // c.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Render scene
-  player.update();
-
-  // Track scroll post distance
-  if (player.position.x > SCROLL_POST_RIGHT) {
-    const scrollPostDistance = player.position.x - SCROLL_POST_RIGHT;
-    camera.x = scrollPostDistance;
-  }
-
-  if (player.position.y < SCROLL_POST_TOP && camera.y > 0) {
-    const scrollPostDistance =SCROLL_POST_TOP - player.position.y;
-    camera.y = scrollPostDistance;
-  }
-
-  // if (player.position.y < SCROLL_POST_BOTTOM) {
-  //   const scrollPostDistance = player.position.y - SCROLL_POST_BOTTOM;
-  //   camera.y = -scrollPostDistance;
-  // }
-
-  c.save();
-  c.scale(dpr, dpr);
-  c.clearRect(0, 0, canvas.width, canvas.height);
-  c.translate(-camera.x, camera.y);
+  c.fillStyle = '#f5f5f5';
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  
   backgroundlevel1.draw();
-  player.draw();
-  // c.fillStyle = '#f5f5f5';
-  // c.fillRect(SCROLL_POST_RIGHT, 200, 10, 100);
-  c.restore();
-
+  
   //   console.log(collisionBlocks);
   collisionBlocks.forEach((collisionBlock) => {
     collisionBlock.draw();
   });
-
+  
   player.velocity.x = 0;
-
+  
   if (keys.d.pressed) {
     player.switchSprite('runRight');
     player.velocity.x = 5;
@@ -146,8 +115,11 @@ function animate() {
       player.switchSprite('idleRight');
     }
   }
+  
+  // Render scene
+  player.draw();
 
-  // Track scroll post distance
+  player.update();
 
   window.requestAnimationFrame(animate);
 }
