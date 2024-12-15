@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/GeykoSergey/kings-and-pigs/issues"
   },
-  "homepage": "https://github.com/GeykoSergey/kings-and-pigs#readme"
+  "homepage": "https://github.com/GeykoSergey/kings-and-pigs#readme",
+  "devDependencies": {
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
+  }
 }
