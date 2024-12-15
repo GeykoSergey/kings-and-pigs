@@ -1,9 +1,21 @@
-class Player extends Sprite {
-  constructor({ collisionBlocks = [], imageSrc, frameRate, animations }) {
-    super({ imageSrc, frameRate, animations });
+import { ctx } from '../../index.js';
+
+export default class Player {
+  constructor(game) {
+    this.game = game;
+
+    this.keys = {
+      w: { pressed: false },
+      a: { pressed: false },
+      d: { pressed: false },
+      space: { pressed: false },
+    };
+
+    this.isMoveBox = true;
+
     this.position = {
-      x: 600,
-      y: 600,
+      x: 100,
+      y: 100,
     };
 
     this.velocity = {
@@ -11,56 +23,144 @@ class Player extends Sprite {
       y: 0,
     };
 
-    // this.width = 25
-    // Высота игрока
-    // const height = 100;
-    // this.height = 25
+    this.gravity = 1.2;
 
-    this.sides = {
-      bottom: this.position.y + this.height,
+    this.image = new Image();
+    this.image.onload = () => {
+      this.loaded = true;
+      this.width = this.image.width / this.frameRate;
+      this.height = this.image.height;
     };
 
-    this.gravity = 1;
+    this.image.src = './../../img/king/idle.png';
+    this.loaded = false;
 
-    this.collisionBlocks = collisionBlocks;
-    // console.log(this.collisionBlocks);
-    // console.log(collisionBlocks);
+    this.frameRate = 11;
+
+    this.animations = {
+      idleRight: {
+        frameRate: 11,
+        frameBuffer: 10,
+        loop: true,
+        imageSrc: './../../img/king/idle-right.png',
+      },
+      idleLeft: {
+        frameRate: 11,
+        frameBuffer: 10,
+        loop: true,
+        imageSrc: './../../img/king/idle-left.png',
+      },
+      runRight: {
+        frameRate: 8,
+        frameBuffer: 10,
+        loop: true,
+        imageSrc: './../../img/king/run-right.png',
+      },
+      runLeft: {
+        frameRate: 8,
+        frameBuffer: 10,
+        loop: true,
+        imageSrc: './../../img/king/run-left.png',
+      },
+      attackLeft: {
+        frameRate: 6,
+        frameBuffer: 5,
+        loop: true,
+        imageSrc: './../../img/king/attack-left.png',
+      },
+      attackRight: {
+        frameRate: 6,
+        frameBuffer: 5,
+        loop: true,
+        imageSrc: './../../img/king/attack-right.png',
+      },
+    };
+
+    this.currentFrame = 0;
+    // elapsedFrames - прошедшие кадры
+    this.elapsedFrames = 0;
+    this.frameBuffer = 10;
+
+    // =========================================================================================================
+    //                                                                   Создаем изображения для каждой анимации
+    // =========================================================================================================
+    if (this.animations) {
+      for (let key in this.animations) {
+        const image = new Image();
+        image.src = this.animations[key].imageSrc;
+        this.animations[key].image = image;
+      }
+    }
   }
 
-  update() {
-    // This is blue box
-    // c.fillStyle = 'rgba(0, 0, 255, 0.5'
-    // c.fillRect(this.position.x, this.position.y, this.width, this.height)
+  draw() {
+    if (!this.loaded) return;
+    const cropBox = {
+      position: { x: this.width * this.currentFrame, y: 0 },
+      width: this.width,
+      height: this.height,
+    };
 
-    // console.log(this.collisionBlocks)
-    // При обновлении добавляем к верхней координате игрока
-    // velocity, которое с каждым циклом анимации увеличивается на
-    // значение gravity, таким образом имитируя ускорение
+    ctx.drawImage(
+      this.image,
+      cropBox.position.x,
+      cropBox.position.y,
+      cropBox.width,
+      cropBox.height,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+    this.upDateFrame();
+
+    // ctx.fillStyle = 'rgba(140, 209, 145, 0.5)';
+    // ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    // ctx.fillStyle = 'rgba(140, 209, 145, 0.5)';
+    // ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    // ctx.fillStyle = 'rgba(29, 133, 231, 0.5)';
+    // ctx.fillRect(this.hitBox.position.x, this.hitBox.position.y, this.hitBox.width, this.hitBox.height);
+  }
+
+  upDateFrame() {
+    this.elapsedFrames++;
+
+    if (this.elapsedFrames % this.frameBuffer === 0) {
+      if (this.currentFrame < this.frameRate - 1) {
+        this.currentFrame++;
+      } else {
+        this.currentFrame = 0;
+      }
+    }
+  }
+
+  // =================================================================================================
+  //                                                                                            update
+  // =================================================================================================
+  update() {
     this.position.x += this.velocity.x;
-    // Check horisintal collision
-    // console.log('Update')
-    // console.log(collisionBlocks)
 
     this.updateHitbox();
+
     this.checkForHorizontalCollision();
 
-    // console.log('Update')
-
-    // Apply gravity
     this.apllyGravity();
 
     this.updateHitbox();
 
-    c.fillRect(
-      this.hitBox.position.x,
-      this.hitBox.position.y,
-      this.hitBox.width,
-      this.hitBox.height
-    );
+    // c.fillRect(
+    //   this.hitBox.position.x,
+    //   this.hitBox.position.y,
+    //   this.hitBox.width,
+    //   this.hitBox.height
+    // );
     this.checkForVerticalCollision();
-    // this.sides.bottom = this.position.y + this.height;
+    this.checkPlatformCollision();
   }
 
+  // =================================================================================================
+  //                                                                                     Switch Sprite
+  // =================================================================================================
   switchSprite(name) {
     if (this.image === this.animations[name].image) return;
     this.currentFrame = 0;
@@ -72,8 +172,8 @@ class Player extends Sprite {
   updateHitbox() {
     this.hitBox = {
       position: {
-        x: this.position.x + 58,
-        y: this.position.y + 34,
+        x: this.position.x + 50,
+        y: this.position.y + 42,
       },
       width: 50,
       height: 53,
@@ -81,36 +181,27 @@ class Player extends Sprite {
   }
 
   checkForHorizontalCollision() {
-    for (let i = 0; i < this.collisionBlocks.length; i++) {
-      const collisionBlock = this.collisionBlocks[i];
-
-      // console.log(collisionBlock);
-      // console.log('Hello block')
+    for (let i = 0; i < this.game.collisionBlocks.length; i++) {
+      const collisionBlock = this.game.collisionBlocks[i];
 
       // if a collission exist
       if (
-        this.hitBox.position.x <=
-          collisionBlock.position.x + collisionBlock.width &&
-        this.hitBox.position.x + this.hitBox.width >=
-          collisionBlock.position.x &&
-        this.hitBox.position.y + this.hitBox.height >=
-          collisionBlock.position.y &&
-        this.hitBox.position.y <=
-          collisionBlock.position.y + collisionBlock.height
+        this.hitBox.position.x <= collisionBlock.x + collisionBlock.width &&
+        this.hitBox.position.x + this.hitBox.width >= collisionBlock.x &&
+        this.hitBox.position.y + this.hitBox.height >= collisionBlock.y &&
+        this.hitBox.position.y <= collisionBlock.y + collisionBlock.height
       ) {
         // Столкновение по оси x двигаясь влево
         if (this.velocity.x < 0) {
           const offset = this.hitBox.position.x - this.position.x;
           this.position.x =
-            collisionBlock.position.x + collisionBlock.width - offset + 0.01;
-          // console.log('collision left');
+            collisionBlock.x + collisionBlock.width - offset + 0.01;
           break;
         }
         if (this.velocity.x > 0) {
           const offset =
             this.hitBox.position.x - this.position.x + this.hitBox.width;
-          this.position.x = collisionBlock.position.x - offset - 0.01;
-          // console.log('collision right');
+          this.position.x = collisionBlock.x - offset - 0.01;
           break;
         }
       }
@@ -125,54 +216,90 @@ class Player extends Sprite {
   checkForVerticalCollision() {
     // Check vertical collision
 
-    for (let i = 0; i < this.collisionBlocks.length; i++) {
-      const collisionBlock = this.collisionBlocks[i];
-
-      // console.log(collisionBlock);
-      // console.log('Hello block')
+    for (let i = 0; i < this.game.collisionBlocks.length; i++) {
+      const collisionBlock = this.game.collisionBlocks[i];
 
       // if a collission exist
       if (
-        this.hitBox.position.x <=
-          collisionBlock.position.x + collisionBlock.width &&
-        this.hitBox.position.x + this.hitBox.width >=
-          collisionBlock.position.x &&
-        this.hitBox.position.y + this.hitBox.height >=
-          collisionBlock.position.y &&
-        this.hitBox.position.y <=
-          collisionBlock.position.y + collisionBlock.height
+        this.hitBox.position.x <= collisionBlock.x + collisionBlock.width &&
+        this.hitBox.position.x + this.hitBox.width >= collisionBlock.x &&
+        this.hitBox.position.y + this.hitBox.height >= collisionBlock.y &&
+        this.hitBox.position.y <= collisionBlock.y + collisionBlock.height
       ) {
         if (this.velocity.y < 0) {
           this.velocity.y = 0;
           const offset = this.hitBox.position.y - this.position.y;
           this.position.y =
-            collisionBlock.position.y + collisionBlock.height - offset + 0.01;
-          // console.log('collision left');
+            collisionBlock.y + collisionBlock.height - offset + 0.01;
           break;
         }
         if (this.velocity.y > 0) {
           this.velocity.y = 0;
           const offset =
             this.hitBox.position.y - this.position.y + this.hitBox.height;
-          this.position.y = collisionBlock.position.y - offset - 0.01;
-
-          // console.log('collision right');
+          this.position.y = collisionBlock.y - offset - 0.01;
           break;
         }
       }
     }
+  }
 
-    // Пока координата низа игрока меньше высоты канваса
-    // y++; и обновляем координату низа игрока bottom = y + height;
-    // Координата низа игрока
-    // let bottom = y + height;
-    // if ((this.sides.bottom + this.velocity.y) < canvas.height) {
-    // Увеличиваем ускорение
-    // this.velocity.y += this.gravity;
+  checkPlatformCollision() {
+    for (let i = 0; i < this.game.collisionPlatforms.length; i++) {
+      const collisionPlatform = this.game.collisionPlatforms[i];
 
-    // } else {
-    // Обнуляем ускорение
-    //     this.velocity.y = 0
-    // }
+      // if a collission exist
+      if (
+        this.hitBox.position.x <=
+          collisionPlatform.x + collisionPlatform.width &&
+        this.hitBox.position.x + this.hitBox.width >= collisionPlatform.x &&
+        this.hitBox.position.y + this.hitBox.height >= collisionPlatform.y &&
+        this.hitBox.position.y <= collisionPlatform.y + collisionPlatform.height
+      ) {
+        // if (this.velocity.y < 0) {
+        //   this.velocity.y = 0;
+        //   const offset = this.hitBox.position.y - this.position.y;
+        //   this.position.y =
+        //     collisionPlatform.y + collisionPlatform.height - offset + 0.01;
+        //   break;
+        // }
+        if (this.velocity.y > 0) {
+          this.velocity.y = 0;
+          const offset =
+            this.hitBox.position.y - this.position.y + this.hitBox.height;
+          this.position.y = collisionPlatform.y - offset - 0.01;
+          break;
+        }
+      }
+    }
+  }
+
+  handleInput() {
+    if (this.keys.d.pressed) {
+      this.switchSprite('runRight');
+      this.velocity.x = 5;
+      this.lastDirrection = 'right';
+    } else if (this.keys.a.pressed) {
+      this.switchSprite('runLeft');
+      if (this.isMoveBox) {
+        this.velocity.x = -1;
+      } else {
+        this.velocity.x = -5;
+      }
+
+      this.lastDirrection = 'left';
+    } else if (this.keys.space.pressed) {
+      if (this.lastDirrection === 'left') {
+        this.switchSprite('attackLeft');
+      } else {
+        this.switchSprite('attackRight');
+      }
+    } else {
+      if (this.lastDirrection === 'left') {
+        this.switchSprite('idleLeft');
+      } else {
+        this.switchSprite('idleRight');
+      }
+    }
   }
 }

@@ -1,30 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-    <body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kings and Pigs</title>
+  </head>
+  <body>
     <style>
-        body {
-            padding: 0;
-            margin: 0;
-            background-color: #37474f;
-        }
-        canvas {
-            image-rendering: pixelated;
-        }
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #37474f;
+      }
+      canvas {
+        image-rendering: pixelated;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
     </style>
     <canvas></canvas>
-    <script src="js/utils.js"></script>
-    <script src="js/data/collisions.js"></script>
-    <script src="js/classes/CollisionBlock.js"></script>
-    <script src="js/classes/Sprite.js"></script>
-    <script src="js/classes/Player.js"></script>
-    <script src="js/classes/Enemy.js"></script>
-    <script src="js/event.Listeners.js"></script>
-    <!-- <script src="test2-index-create-player-class.js"></script> -->
-    <script src="index.js"></script>
-</body>
+    <script src="index.js" type="module"></script>
+  </body>
 </html>

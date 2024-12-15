@@ -1,7 +1,7 @@
 import { ctx } from '../../index.js';
 import { checkCollisions } from '../utils.js';
 
-export default class Enemy {
+export default class DynamicGameObject {
   constructor(game, { position }) {
     this.game = game;
     this.position = position;
@@ -29,11 +29,11 @@ export default class Enemy {
     this.image = new Image();
     this.image.onload = () => {
       this.loaded = true;
-      this.width = this.image.width / this.frameRate;
+      this.width = this.image.width;
       this.height = this.image.height;
     };
 
-    this.image.src = './../../img/pig/pig-idle-left.png';
+    this.image.src = './../../img/game-objects/box-idle.png';
     this.loaded = false;
 
     this.frameRate = 11;
@@ -112,36 +112,61 @@ export default class Enemy {
       this.width,
       this.height
     );
-    this.upDateFrame();
-
-    // ctx.fillStyle = 'rgba(140, 209, 145, 0.5)';
-    // ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-    // ctx.fillStyle = 'rgba(140, 209, 145, 0.5)';
-    // ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-    // ctx.fillStyle = 'rgba(29, 133, 231, 0.5)';
-    // ctx.fillRect(this.hitBox.position.x, this.hitBox.position.y, this.hitBox.width, this.hitBox.height);
+    // this.upDateFrame();
   }
 
-  upDateFrame() {
-    this.elapsedFrames++;
+  // upDateFrame() {
+  //   this.elapsedFrames++;
 
-    if (this.elapsedFrames % this.frameBuffer === 0) {
-      if (this.currentFrame < this.frameRate - 1) {
-        this.currentFrame++;
-      } else {
-        this.currentFrame = 0;
-      }
-    }
+  //   if (this.elapsedFrames % this.frameBuffer === 0) {
+  //     if (this.currentFrame < this.frameRate - 1) {
+  //       this.currentFrame++;
+  //     } else {
+  //       this.currentFrame = 0;
+  //     }
+  //   }
+  // }
+
+  updateHitbox() {
+    this.hitBox = {
+      position: {
+        x: this.position.x,
+        y: this.position.y,
+      },
+      width: 55,
+      height: 40,
+    };
   }
 
   // =================================================================================================
   //                                                                                          update()
   // =================================================================================================
+
+  move() {
+    this.position.x -= 1;
+    this.game.player.isMoveBox = true;
+  }
+
   update() {
     this.position.x += this.velocity.x;
 
     this.updateHitbox();
 
+    const collisionDirection = checkCollisions(this.game.player, this);
+
+    console.log(collisionDirection);
+
+    if (collisionDirection) {
+      if (
+        collisionDirection === 'right' &&
+        this.game.player.keys.a.pressed
+        // this.game.player.keys.a.pressed.true
+      ) {
+        this.move();
+
+        console.log(this.game.player.keys.a.pressed.true);
+      }
+    }
     this.checkForHorizontalCollision();
 
     this.apllyGravity();
@@ -159,7 +184,7 @@ export default class Enemy {
       this.turnTimer += 1;
     } else {
       this.turnTimer = 0;
-      this.changeState();
+      // this.changeState();
       // this.turnInterval = Math.floor(Math.random() * 8) + 1;
     }
   }
@@ -167,18 +192,18 @@ export default class Enemy {
   // =================================================================================================
   //                                                                                     changeState()
   // =================================================================================================
-  changeState() {
-    const randomize = Math.random();
-    if (this.velocity.y === 0) {
-      if (randomize < 0.3) {
-        this.runLeft();
-      } else if (randomize < 0.6) {
-        this.runRight();
-      } else {
-        this.idle();
-      }
-    }
-  }
+  // changeState() {
+  //   const randomize = Math.random();
+  //   if (this.velocity.y === 0) {
+  //     if (randomize < 0.3) {
+  //       this.runLeft();
+  //     } else if (randomize < 0.6) {
+  //       this.runRight();
+  //     } else {
+  //       this.idle();
+  //     }
+  //   }
+  // }
 
   runLeft() {
     this.velocity.x = -1;
@@ -206,21 +231,11 @@ export default class Enemy {
     this.frameBuffer = this.animations[name].frameBuffer;
   }
 
-  updateHitbox() {
-    this.hitBox = {
-      position: {
-        x: this.position.x + 24,
-        y: this.position.y + 22,
-      },
-      width: 50,
-      height: 53,
-    };
-  }
-
   checkForHorizontalCollision() {
     for (let i = 0; i < this.game.collisionBlocks.length; i++) {
       const collisionBlock = this.game.collisionBlocks[i];
 
+      // if a collission exist
       if (
         this.hitBox.position.x <= collisionBlock.x + collisionBlock.width &&
         this.hitBox.position.x + this.hitBox.width >= collisionBlock.x &&
@@ -232,19 +247,18 @@ export default class Enemy {
           const offset = this.hitBox.position.x - this.position.x;
           this.position.x =
             collisionBlock.x + collisionBlock.width - offset + 0.01;
-          // this.velocity.x = 1;
+          this.velocity.x = 0;
           // this.switchSprite('runRight');
-          this.idle();
+          // this.idle();
           break;
         }
-
         if (this.velocity.x > 0) {
           const offset =
             this.hitBox.position.x - this.position.x + this.hitBox.width;
           this.position.x = collisionBlock.x - offset - 0.01;
-          // this.velocity.x = -1;
+          this.velocity.x = 0;
           // this.switchSprite('runLeft');
-          this.idle();
+          // this.idle();
           break;
         }
       }
@@ -269,13 +283,13 @@ export default class Enemy {
         this.hitBox.position.y + this.hitBox.height >= collisionBlock.y &&
         this.hitBox.position.y <= collisionBlock.y + collisionBlock.height
       ) {
-        if (this.velocity.y < 0) {
-          this.velocity.y = 0;
-          const offset = this.hitBox.position.y - this.position.y;
-          this.position.y =
-            collisionBlock.y + collisionBlock.height - offset + 0.01;
-          break;
-        }
+        // if (this.velocity.y < 0) {
+        //   this.velocity.y = 0;
+        //   const offset = this.hitBox.position.y - this.position.y;
+        //   this.position.y =
+        //     collisionBlock.y + collisionBlock.height - offset + 0.01;
+        //   break;
+        // }
         if (this.velocity.y > 0) {
           this.velocity.y = 0;
           const offset =

@@ -1,12 +1,13 @@
-class CollisionBlock {
-    constructor ({position}) {
-      this.position = position,
-      this.width = 32,
-      this.height = 32
+export default class CollisionBlock {
+    constructor ({x, y, size}) {
+      this.x = x,
+      this.y = y,
+      this.width = size,
+      this.height = size
     }
   
     draw() {
-      c.fillStyle = 'rgba(0, 0, 255, 0)';
-      c.fillRect(this.position.x, this.position.y, this.width, this.height);
+      ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+      ctx.fillRect(this.x, this.y, this.width, this.height)
     }
   }
