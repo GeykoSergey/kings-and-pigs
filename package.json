@@ -1,0 +1,19 @@
+{
+  "name": "kings-and-pigs",
+  "version": "1.0.0",
+  "description": "js game canvas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeykoSergey/kings-and-pigs.git"
+  },
+  "author": "Geyko Sergey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GeykoSergey/kings-and-pigs/issues"
+  },
+  "homepage": "https://github.com/GeykoSergey/kings-and-pigs#readme"
+}
